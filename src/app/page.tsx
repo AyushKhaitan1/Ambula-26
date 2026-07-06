@@ -1,65 +1,187 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+interface DoctorData {
+  _id: string;
+  name: string;
+  specialization: string;
+  location: string;
+  consultationFee: number;
+  experience: number;
+  rating: number;
+  about: string;
+  avatar: string;
+}
+
+export default function HomePage() {
+  const [doctors, setDoctors] = useState<DoctorData[]>([]);
+  const [specialization, setSpecialization] = useState("all");
+  const [location, setLocation] = useState("all");
+  const [loading, setLoading] = useState(true);
+
+  // Specialties and locations for filter dropdowns
+  const specializations = ["all", "Cardiologist", "Dermatologist", "Pediatrician", "General Physician"];
+  const locations = ["all", "Bangalore", "Delhi", "Mumbai"];
+
+  useEffect(() => {
+    async function fetchDoctors() {
+      setLoading(true);
+      try {
+        const query = new URLSearchParams();
+        if (specialization !== "all") query.set("specialization", specialization);
+        if (location !== "all") query.set("location", location);
+
+        const response = await fetch(`/api/doctors?${query.toString()}`);
+        const data = await response.json();
+        if (data.success) {
+          setDoctors(data.doctors);
+        }
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDoctors();
+  }, [specialization, location]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="page-container animate-fade-in">
+      {/* Hero Section */}
+      <header style={{ textAlign: "center", marginBottom: "3rem" }}>
+        <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem", lineHeight: "1.2" }}>
+          Find the Right Doctor, <span style={{ color: "var(--primary)" }}>Book in 2 Minutes</span>
+        </h1>
+        <p style={{ color: "var(--text-muted)", maxWidth: "600px", margin: "0 auto", fontSize: "1.1rem" }}>
+          Connect with trusted healthcare professionals. Enter details, select your slot, and confirm instantly.
+        </p>
+      </header>
+
+      {/* Search Filters Bar */}
+      <section className="glass-container" style={{ padding: "1.5rem", marginBottom: "2.5rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }} className="filter-grid">
+          <div className="input-group" style={{ marginBottom: 0 }}>
+            <label className="input-label">Specialization</label>
+            <select
+              value={specialization}
+              onChange={(e) => setSpecialization(e.target.value)}
+              className="input-field"
+              style={{ appearance: "none", backgroundImage: "url('data:image/svg+xml;utf8,<svg fill=\"white\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\"/></svg>')", backgroundRepeat: "no-repeat", backgroundPosition: "right 10px center" }}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              {specializations.map((spec) => (
+                <option key={spec} value={spec} style={{ background: "#1f2937" }}>
+                  {spec === "all" ? "All Specializations" : spec}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="input-group" style={{ marginBottom: 0 }}>
+            <label className="input-label">Location</label>
+            <select
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="input-field"
+              style={{ appearance: "none", backgroundImage: "url('data:image/svg+xml;utf8,<svg fill=\"white\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\"/></svg>')", backgroundRepeat: "no-repeat", backgroundPosition: "right 10px center" }}
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              {locations.map((loc) => (
+                <option key={loc} value={loc} style={{ background: "#1f2937" }}>
+                  {loc === "all" ? "All Locations" : loc}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </section>
+
+      {/* Doctors List */}
+      <section>
+        <h2 style={{ fontSize: "1.5rem", marginBottom: "1.5rem", fontFamily: "var(--font-display)" }}>
+          Available Doctors ({doctors.length})
+        </h2>
+
+        {loading ? (
+          <div style={{ display: "flex", justifyContent: "center", padding: "4rem 0" }}>
+            <div className="loading-spinner"></div>
+          </div>
+        ) : doctors.length === 0 ? (
+          <div className="glass-container animate-slide-up" style={{ padding: "4rem 2rem", textAlign: "center" }}>
+            <p style={{ color: "var(--text-muted)", fontSize: "1.1rem" }}>
+              No doctors found matching your criteria. Try adjusting the filters.
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.5rem" }}>
+            {doctors.map((doctor) => (
+              <div key={doctor._id} className="glass-card animate-slide-up" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+                {/* Profile Header */}
+                <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "1rem" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={doctor.avatar}
+                    alt={doctor.name}
+                    style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--primary-glow)" }}
+                  />
+                  <div>
+                    <h3 style={{ fontSize: "1.15rem", marginBottom: "0.2rem" }}>{doctor.name}</h3>
+                    <span className="badge badge-available" style={{ fontSize: "0.7rem", padding: "0.15rem 0.5rem" }}>
+                      {doctor.specialization}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Body Details */}
+                <div style={{ flex: 1, fontSize: "0.9rem", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "0.4rem", marginBottom: "1.25rem" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span>Experience:</span>
+                    <strong style={{ color: "#ffffff" }}>{doctor.experience} Years</strong>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span>Location:</span>
+                    <strong style={{ color: "#ffffff" }}>{doctor.location}</strong>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <span>Rating:</span>
+                    <strong style={{ color: "var(--warning)" }}>⭐ {doctor.rating.toFixed(1)}</strong>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.4rem", borderTop: "1px solid rgba(255,255,255,0.05)", paddingTop: "0.4rem" }}>
+                    <span>Consultation Fee:</span>
+                    <strong style={{ color: "var(--secondary)", fontSize: "1.05rem" }}>₹{doctor.consultationFee}</strong>
+                  </div>
+                </div>
+
+                {/* Action button */}
+                <Link href={`/profile/${doctor._id}`} className="btn btn-primary" style={{ width: "100%", padding: "0.6rem" }}>
+                  Book Appointment
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Embedded Spinner Styles */}
+      <style jsx global>{`
+        .loading-spinner {
+          width: 40px;
+          height: 40px;
+          border: 3px solid rgba(255, 255, 255, 0.1);
+          border-radius: 50%;
+          border-top-color: var(--primary);
+          animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        @media (max-width: 580px) {
+          .filter-grid {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
