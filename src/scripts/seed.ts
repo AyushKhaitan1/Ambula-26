@@ -27,7 +27,7 @@ const DOCTORS_DATA = [
     experience: 8,
     rating: 4.7,
     about: "Dr. Sneha Patel specializes in clinical and aesthetic dermatology, treating all kinds of skin, hair, and nail conditions with state-of-the-art procedures.",
-    avatar: "https://images.unsplash.com/photo-1594824813573-246434de83fb?q=80&w=300&auto=format&fit=crop",
+    avatar: "/sneha.png",
   },
   {
     name: "Dr. Rajesh Kumar",
