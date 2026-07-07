@@ -93,7 +93,7 @@ classDiagram
         +ObjectId _id
         +ObjectId doctorId
         +Date datetime
-        +String status ("available" | "booked" | "blocked")
+        +String status
         +ObjectId bookingId
     }
 
@@ -103,10 +103,15 @@ classDiagram
         +ObjectId doctorId
         +ObjectId slotId
         +Date datetime
-        +Object patientDetails { name, age, phone }
-        +Object healthSummary { bloodGroup, conditions, medications }
-        +String status ("pending" | "confirmed" | "completed" | "cancelled")
-        +Object consultationNotes { diagnosis, prescription, updatedAt }
+        +String patientName
+        +Number patientAge
+        +String patientPhone
+        +String bloodGroup
+        +String medicalConditions
+        +String currentMedications
+        +String status
+        +String diagnosis
+        +String prescription
         +Date createdAt
     }
 
